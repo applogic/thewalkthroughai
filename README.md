@@ -1,19 +1,37 @@
-# App template
+# The Walkthrough AI — v2 brochure
 
-Runable copies this Bun and Turborepo project into each new sandbox.
+Marketing brochure for The Walkthrough AI, served at https://thewalkthroughai.com/v2/.
 
-The root package commands are the external contract:
+Static single-page app built with **Vite + React + Tailwind CSS v4**. There is no backend: the
+brief form posts to the shared **form-gateway** on cloud1 (`/api/submit`), which emails each
+submission. No third-party platform dependency.
 
-- `bun run dev` starts the web app.
-- `bun run dev:desktop` and `bun run dev:mobile` start platform clients.
-- `bun run build` builds every package.
-- `bun run start` starts or restarts the production server.
-- `bun run stop` stops the production server.
-- `bun run lint` and `bun run typecheck` validate the project.
-- The `db:generate`, `db:migrate`, and `db:push` commands manage the database.
+## Develop
 
-Deployment tools depend on these command names. Their implementations may change, but the names must remain stable.
+```bash
+npm install
+npm run dev       # http://localhost:4200/v2/
+```
 
-The web package owns the API, database, and shared web interface. The mobile package is an Expo client. The desktop package is an Electron shell around the web app. Services use the fixed ports defined in `__ports.cjs`, and the web health endpoint is `/api/health`.
+The form calls `/api/submit` on the same origin, so it only works behind the production nginx
+(or a local proxy to the gateway).
 
-Secrets belong in the root `.env` file. Browser values must use the `VITE_` prefix. Commands prefixed with `internal:` are for template maintenance.
+## Build
+
+```bash
+npm run build     # typecheck, then outputs the site to dist/v2/
+npm run lint      # oxlint
+npm run typecheck
+```
+
+The build output lives in `dist/v2/` so nginx can serve it with `root .../dist` and a 1:1 URL to
+disk mapping. The Vite `base` is `/v2/`; reference public assets through
+`import.meta.env.BASE_URL`, never a hardcoded `/images/...` path.
+
+## Deploy
+
+See [DEPLOY.md](DEPLOY.md). After the one-time setup, push to `main` and run on the server:
+
+```bash
+sh /home/sites/thewalkthroughai.com/web2/deploy.sh
+```
